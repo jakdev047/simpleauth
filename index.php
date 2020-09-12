@@ -5,18 +5,24 @@
     ]);
 
     // variable 
-    $_SESSION['login'] = false;
+    $username = filter_input(INPUT_POST,'username',FILTER_SANITIZE_STRING);
+    $password = filter_input(INPUT_POST,'password',FILTER_SANITIZE_STRING);
+    $fp = fopen("./data/user.txt","r");
     $error = false;
 
+    // initial session create
+    $_SESSION['login'] = false;
+
     // username & password chewck
-    if( isset($_POST['username']) && isset($_POST['password']) ) {
-        if( 'admin' == $_POST['username'] && 'd033e22ae348aeb5660fc2140aec35850c4da997' == sha1($_POST['password'])) {
-            $_SESSION['login'] = true;
-            // header('location:index.php');
+    if( $username && $password ) {
+        while($data = fgetcsv($fp)) {
+            if( $data[0] == $username && $data[1] == sha1($password) ) {
+                $_SESSION['login'] = true;
+                // header('location:index.php');
+            }
         }
 
-        else {
-            $_SESSION['login'] = false;
+        if( !$_SESSION['login'] ) {
             $error = true;
         }
     }
